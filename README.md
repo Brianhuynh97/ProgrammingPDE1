@@ -4,9 +4,7 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ## Overview
-**ProgrammingPDE** is a Python project for solving **1D Partial Differential Equations (PDEs)** using the **Finite Element Method (FEM)**. It demonstrates numerical techniques for grid generation, matrix assembly, solving linear systems, and visualizing basis functions efficiently.
-
-Ideal for students, researchers, or anyone learning numerical PDEs.
+**ProgrammingPDE** is a Python project (part of "Numerical Method for Partial Differential Equations" course at RWTH Aachen University) for solving **1D Partial Differential Equations (PDEs)** using the **Finite Element Method (FEM)**. It demonstrates numerical techniques for grid generation, matrix assembly, solving linear systems, and visualizing basis functions efficiently.
 
 ---
 
