@@ -13,7 +13,7 @@
 - ✅ **Stiffness Matrix Assembly:** Efficient sparse matrix construction.  
 - ✅ **RHS Vector Assembly:** Set up the right-hand side vector for PDE systems.  
 - ✅ **Linear System Solver:** Solve `Ax = b` using sparse linear algebra.  
-- ✅ **Visualization:** Plot FEM basis functions with Matplotlib.  
+- ✅ **Visualization:** Plot FEM basis functions 
 
 ---
 
