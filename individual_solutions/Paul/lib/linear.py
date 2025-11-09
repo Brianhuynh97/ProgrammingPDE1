@@ -1,7 +1,6 @@
 import numpy as np
 import scipy as sp
 
-
 def basis(x, i: int, h):
     x_i = h * i
 
@@ -42,3 +41,5 @@ def b_j_3(j, h):
         - np.sin(h * np.pi * (j + 1))
         + 2 * np.sin(h * np.pi * j)
     ) / (h * np.pi**2)
+
+
