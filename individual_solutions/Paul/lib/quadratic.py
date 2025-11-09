@@ -15,31 +15,18 @@ def a_ij(i, j, h):
     i_even = i % 2 == 0
     j_even = j % 2 == 0
     diff = i - j
-    # if i == j:
-    #     if i_even:
-    #         return 2 / h
-    #     else:
-    #         return 4 * h**3 / 5
-    # if i_even:
-    #     if np.abs(diff) == 2:
-    #         return -1 / h
-    # if ((diff == -1) and (i_even)) or ((diff == 1) and (j_even)):
-    #     return 2 * h**2
-    # if ((diff == 1) and (i_even)) or ((diff == -1) and (i_even)):
-    #     return -2 * h**2
-    # return 0
+
     if i == j:
         if i_even:
             return 2 / h
         else:
             return 16 / 3 / h
-    if i_even:
-        if np.abs(diff) == 2:
-            return -1 / h
-    if ((diff == -1) and (i_even)) or ((diff == 1) and (j_even)):
-        return 2 * h
-    if ((diff == 1) and (i_even)) or ((diff == -1) and (j_even)):
-        return -2 * h
+    elif np.abs(diff) == 2 and i_even:
+        return -1 / h
+    # if ((diff == -1) and (i_even)) or ((diff == 1) and (j_even)):
+    #     return 2 / h
+    # if ((diff == 1) and (i_even)) or ((diff == -1) and (j_even)):
+    #     return -2 / h
     return 0
 
 
@@ -60,9 +47,26 @@ def b_j_1(j, h):
 
 
 def b_j_2(j, h):
-    return
+    return 2 * basis(1 / 2, j, h)
 
 
 def b_j_3(j, h):
 
-    return
+    if j % 2 == 0:
+        return (
+            -np.sin(h * np.pi * (j / 2 - 1))
+            - np.sin(h * np.pi * (j / 2 + 1))
+            + 2 * np.sin(h * np.pi * j / 2)
+        ) / (h * np.pi**2)
+    else:
+
+        return (
+            -4
+            / (h**2 * np.pi**3)
+            * (
+                2 * (np.cos(np.pi * h * (j + 1) / 2) - np.cos(np.pi * h * (j - 1) / 2))
+                + h
+                * np.pi
+                * (np.sin(np.pi * h * (j + 1) / 2) + np.sin(np.pi * h * (j - 1) / 2))
+            )
+        )

@@ -33,7 +33,7 @@ def f1pp(x):
 
 
 def f2(x):
-    return 1 - np.abs(2 * (x - 0.5))
+    return 0.5 * (1 - np.abs(2 * (x - 0.5)))
 
 
 def f2pp(x):
