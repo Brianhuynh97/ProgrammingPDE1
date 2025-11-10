@@ -3,25 +3,26 @@ import scipy as sp
 
 
 def basis(x, i: int, h):
-    x_i = i * h / 2
-    if i % 2 == 0:
-        y = np.maximum(-np.abs(x - x_i) / h + 1, 0)
+    x_i = i * h / 2 # center of the basis function
+    if i % 2 == 0: # even index -> linear basis function
+        y = np.maximum(-np.abs(x - x_i) / h + 1, 0) # function is 0 outside the support [x_i - h, x_i + h]
+        # within the support, it linearly increases from 0 to 1 at x_i and then decreases back to 0
     else:
-        y = np.maximum(-4 / h**2 * (x - x_i) ** 2 + 1, 0)
+        y = np.maximum(-4 / h**2 * (x - x_i) ** 2 + 1, 0) # peak at x_i, 0 at x_i - h/2 and x_i + h/2
     return y
 
 
 def a_ij(i, j, h):
-    i_even = i % 2 == 0
-    j_even = j % 2 == 0
+    i_even = i % 2 == 0 # check if i is even
+    j_even = j % 2 == 0 # check if j is even
     diff = i - j
 
     if i == j:
         if i_even:
-            return 2 / h
+            return 2 / h # diagonal entries for linear basis functions
         else:
-            return 16 / 3 / h
-    elif np.abs(diff) == 2 and i_even:
+            return 16 / 3 / h # diagonal entries for quadratic basis functions
+    elif np.abs(diff) == 2 and i_even: # both i and j are even and neighbors
         return -1 / h
     # if ((diff == -1) and (i_even)) or ((diff == 1) and (j_even)):
     #     return 2 / h
@@ -40,10 +41,11 @@ def b_j(j, h, func, a, b):
 
 
 def b_j_1(j, h):
-    if j % 2 == 0:
+    if j % 2 == 0: # even index -> linear basis function
+        return h / 3 
         return h
     else:
-        return 2 * h / 3
+        return 2 * h / 3 # odd index -> quadratic basis function
 
 
 def b_j_2(j, h):
@@ -62,9 +64,9 @@ def b_j_3(j, h):
 
         return (
             -4
-            / (h**2 * np.pi**3)
+            / (h**2 * np.pi**3) # coefficient from integrating quadratic basis function
             * (
-                2 * (np.cos(np.pi * h * (j + 1) / 2) - np.cos(np.pi * h * (j - 1) / 2))
+                2 * (np.cos(np.pi * h * (j + 1) / 2) - np.cos(np.pi * h * (j - 1) / 2)) # center contribution
                 + h
                 * np.pi
                 * (np.sin(np.pi * h * (j + 1) / 2) + np.sin(np.pi * h * (j - 1) / 2))

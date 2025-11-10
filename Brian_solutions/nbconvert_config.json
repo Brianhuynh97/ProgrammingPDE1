@@ -1,0 +1,18 @@
+{
+    "PDFExporter": {
+        "latex_command": [
+            "xelatex",
+            "-interaction=nonstopmode",
+            "{filename}"
+        ],
+        "verbose": true
+    },
+    "LatexExporter": {
+        "template_file": "article",
+        "latex_command": [
+            "xelatex",
+            "-interaction=nonstopmode",
+            "{filename}"
+        ]
+    }
+}

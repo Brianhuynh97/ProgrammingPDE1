@@ -139,7 +139,8 @@ def plotResult(x, u, X, U, title='FEM 1D', color='r'):
 
 # 5. Example Tests
 if __name__ == "__main__":
-    x, u, ua = FEM1DConstant(10)
+    # Constant RHS
+    x, u, ua = FEM1DConstant(11)
     X = np.linspace(0, 1, 1000)
     U = -0.5 * (X - 0.5) ** 2 + 1 / 8
     plotResult(x, u, X, U, title='FEM 1D for f = 1', color='r')
@@ -149,53 +150,3 @@ if __name__ == "__main__":
     #X = np.linspace(0, 1, 1000)
     #U = np.where(X <= 0.5, X, 1 - X)
     #plotResult(x, u, X, U, title='FEM 1D for delta(x-0.5)', color='g')
-
-def L2error(u_numeric, u_exact, lattice):
-    error_sq = 0
-    for i in range(len(lattice)-1):
-        h = lattice[i+1] - lattice[i]
-        e_left = u_numeric[i] - u_exact[i]
-        e_right = u_numeric[i+1] - u_exact[i+1]
-        error_sq += h * (e_left**2 + e_left*e_right + e_right**2)/3
-    return np.sqrt(error_sq)
-
-def plotResult(x, u, X, U, title='FEM 1D'):
-    u_int = np.interp(X, x, u)  
-    plt.figure(figsize=(8,5))
-    plt.plot(X, u_int, '--r', label='FEM (interpolated)')
-    plt.plot(x, u, 'or', label='FEM nodes')
-    plt.plot(X, U, '-b', label='Analytical')
-    plt.xlabel('x')
-    plt.ylabel('u(x)')
-    plt.title(title)
-    plt.legend()
-    plt.grid(True)
-    plt.show()
-
-if __name__ == "__main__":
-    N_plot = 20
-    X = np.linspace(0,1,1000)
-    x, u, ua = FEM1DConstant(N_plot)
-    U = -0.5*(X-0.5)**2 + 1/8
-    plotResult(x, u, X, U, title='FEM 1D for f = 1')
-
-    N_values = np.linspace(10,500,50, dtype=int)
-    err_constant = np.zeros(len(N_values))
-    h_values = np.zeros(len(N_values))
-
-    for i, N in enumerate(N_values):
-        x, u, ua = FEM1DConstant(N)
-        err_constant[i] = L2error(u, ua, x)
-        h_values[i] = x[1]-x[0]
-
-    plt.figure(figsize=(8,5))
-    plt.loglog(h_values, err_constant, 'o--', label='$f=1$')
-    plt.xlabel('Mesh width h')
-    plt.ylabel('L2 error')
-    plt.title('Convergence of FEM solution for f=1')
-    plt.grid(True, which='both', ls='--')
-    plt.legend()
-    plt.show()
-
-    p_constant = np.polyfit(np.log(h_values), np.log(err_constant), 1)[0]
-    print(f"Convergence order for f=1: {-p_constant:.2f}")
