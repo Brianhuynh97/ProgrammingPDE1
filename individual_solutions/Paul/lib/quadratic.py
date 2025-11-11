@@ -1,5 +1,5 @@
 import numpy as np
-import scipy as sp
+import scipy as sp #type: ignore
 
 
 def basis(x, i: int, h):
