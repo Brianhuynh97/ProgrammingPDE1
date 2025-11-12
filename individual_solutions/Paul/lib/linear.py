@@ -1,7 +1,7 @@
 import numpy as np
 import scipy as sp
 
-
+# Define standard basic hat function
 def basis(x, i: int, h):
     x_i = h * i # center of the basis function
 
@@ -9,7 +9,7 @@ def basis(x, i: int, h):
     # within the support, it linearly increases from 0 to 1 at x_i and then decreases back to 0
     return y
 
-
+# Implement the stiffness matrix entries
 def a_ij(i, j, h):
     if i == j: # diagonal entry
         return 2 / h # diagonal entries

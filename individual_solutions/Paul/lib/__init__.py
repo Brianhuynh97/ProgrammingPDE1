@@ -19,7 +19,7 @@ def constr_f(vec, x, h, func=lib.linear.basis):
 
 ############### f1 #################
 
-
+# analytical function for f=1
 def f1(x):
     return -0.5 * (x - 0.5) ** 2 + 0.125
 
@@ -76,13 +76,15 @@ def l2_err(a, b, h):
 
 def l2_err_func(func, y_vals, x_vals, order=1):
     spline = sp.interpolate.make_interp_spline(x_vals, y_vals, k=order)
+    # construct spline interpolation of the approximate solution. Use k=1 for linear (hat) basis, k=2 for quadratic elements. 
+    # #This reconstructs 𝑢ℎ(𝑥) inside each element
 
     def f(x):
         # np.interp works here because hat functions are used.
         # this results in u_N being a linear interpolation between the u(x_k)
         return np.square(func(x) - spline(x))  # np.interp(x, x_vals, y_vals))
 
-    err2, _ = sp.integrate.quad(f, x_vals[0], x_vals[-1])
+    err2, _ = sp.integrate.quad(f, x_vals[0], x_vals[-1]) # integrate the squared error over the domain
     return np.sqrt(err2)
 
 
@@ -92,7 +94,7 @@ def l1_err(a, b, h):
 
 
 def l1_err_func(func, y_vals, x_vals, order=1):
-    spline = sp.interpolate.make_interp_spline(x_vals, y_vals, k=order)
+    spline = sp.interpolate.make_interp_spline(x_vals, y_vals, k=order) 
 
     def f(x):
         return np.abs(func(x) - spline(x))  # np.interp(x, x_vals, y_vals)

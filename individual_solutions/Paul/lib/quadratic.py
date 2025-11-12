@@ -42,7 +42,7 @@ def b_j(j, h, func, a, b):
 
 def b_j_1(j, h):
     if j % 2 == 0: # even index -> linear basis function
-        return h / 3 
+        return h 
         return h
     else:
         return 2 * h / 3 # odd index -> quadratic basis function
