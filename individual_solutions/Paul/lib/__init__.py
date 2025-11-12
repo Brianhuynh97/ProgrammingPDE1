@@ -94,7 +94,9 @@ def l1_err(a, b, h):
 
 
 def l1_err_func(func, y_vals, x_vals, order=1):
-    spline = sp.interpolate.make_interp_spline(x_vals, y_vals, k=order) 
+    spline = sp.interpolate.make_interp_spline(x_vals, y_vals, k=order) # Builds an interpolation spline of degree k = order.
+
+# Use k=1 for linear (hat) basis, k=2 for quadratic elements. This reconstructs 𝑢ℎ(𝑥) inside each element.
 
     def f(x):
         return np.abs(func(x) - spline(x))  # np.interp(x, x_vals, y_vals)
