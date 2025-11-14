@@ -118,5 +118,5 @@ def linf_err_func(func, y_vals, x_vals, order=1):
     # find maximum (or minimum of -error) numerically
     # (might be overkill as generally just sampling it and getting the max m
     # is probably quicker)
-    res = sp.optimize.minimize_scalar(f, bounds=(x_vals[0], x_vals[-1]))
+    res = sp.optimize.differential_evolution(f, bounds=[(x_vals[0], x_vals[-1])])
     return -res.fun

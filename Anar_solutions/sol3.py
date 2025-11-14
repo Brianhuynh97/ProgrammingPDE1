@@ -30,9 +30,7 @@ class PoissonSolver1D:
         self.h = (b-a)/(N+1)
 
     def phi(self,i,x):
-        xs, h = self.xs, self.h # Each ϕᵢ is a triangular "hat" function centered at the i-th node:
-                                # - Rises linearly from 0 → 1 over [xᵢ, xᵢ₊₁]
-                                # - Falls linearly from 1 → 0 over [xᵢ₊₁, xᵢ₊₂]
+        xs, h = self.xs, self.h
         if xs[i] <= x <= xs[i+1]:
             return (x-xs[i])/h
         elif xs[i+1] <  x <= xs[i+2]:
@@ -58,15 +56,14 @@ class PoissonSolver1D:
         if f.type in ("continuous", "mixed"):
             f_cont = f.continuous
             for i in range(N):
-                rhs[i], _ = quad(lambda x: f_cont(x)*phi(i,x), xs[i], xs[i+2]) 
-                #Numerically integrates ∫ f(x) * ϕᵢ(x) dx
+                rhs[i], _ = quad(lambda x: f_cont(x)*phi(i,x), xs[i], xs[i+2])
+
         if f.type in ("singular", "mixed"):
             for f_sing in f.singular:
                 x0, w = f_sing["point"], f_sing["weight"]
                 i = np.searchsorted(xs, x0) - 1
                 if i == 0:
-                    rhs[i] += w*phi(i,x0) #If f(x) contains w * δ(x − x₀), then: ∫ δ(x − x₀) * ϕᵢ(x) dx = ϕᵢ(x₀) 
-                    #So it directly adds a point contribution.
+                    rhs[i] += w*phi(i,x0)
                 elif i == N:
                     rhs[i-1] += w*phi(i-1,x0)
                 else:
@@ -93,50 +90,105 @@ class PoissonSolver1D:
                 return coeffs[i-1]*phi(i-1,x) + coeffs[i]*phi(i,x)
         self.solution = aprxSol
 
-## FIRST FUNCTION ##
-# f_cont = lambda x: 1
-# f_sing = None
+    def cal_errL2(self,trueSol):
+        aprxSol, a, b = self.solution, self.a, self.b
+        val, _ = quad(lambda x: abs(aprxSol(x) - trueSol(x))**2, a, b)
+        self.errL2 = np.sqrt(val)
+        return self.errL2
 
+    def cal_errL1(self, trueSol):
+        aprxSol, a, b = self.solution, self.a, self.b
+        self.errL1, _ = quad(lambda x: abs(aprxSol(x) - trueSol(x)), a, b)
+        return self.errL1
+
+    def cal_errLinf(self, trueSol, n = 1000):
+        aprxSol, a, b = self.solution, self.a, self.b
+        xs = np.linspace(a,b,n)
+        self.errLinf = np.max(np.abs([aprxSol(x) - trueSol(x) for x in xs]))
+        return self.errLinf
+
+    def cal_errs(self, trueSol, n=1000):
+        return [self.cal_errL2(trueSol), self.cal_errL1(trueSol), 
+                self.cal_errLinf(trueSol, n)]
+
+def isEven(num):
+    return num%2==0
+
+### FIRST FUNCTION ###
+## FIRST FUNCTION ##
+f_cont = lambda x: 1
+f_sing = None
+
+## FIRST TRUE SOLUTION ##
+def trueSol(x):
+    return -(x-1/2)*(x-1/2)/2 + 1/8
+
+### SECOND FUNCTION ###
 ## SECOND FUNCTION ##
 # f_cont = lambda x: np.sin(np.pi*x)
 # f_sing = None
-
-## THIRD FUNCTION ##
-f_cont = None
-f_sing = [{"point": 1/2, "weight": 2}]
-
-f = Function(f_cont, f_sing)
-
-start = time.perf_counter()
-solver = PoissonSolver1D(f, N = 1000)
-solver.assemble()
-solver.solve()
-aprxSol = solver.solution
-end = time.perf_counter()
-print(f"Solve time: {end - start:.6f} seconds")
-
-## FIRST TRUE SOLUTION ##
-# def trueSol(x):
-#     return -(x-1/2)*(x-1/2)/2 + 1/8
 
 ## SECOND TRUE SOLUTION ##
 # def trueSol(x):
 #     return np.sin(np.pi*x)/(np.pi*np.pi)
 
+### THIRD FUNCTION ###
+## THIRD FUNCTION ##
+# f_cont = None
+# f_sing = [{"point": 1/2, "weight": 2}]
+
 ## THIRD TRUE SOLUTION ##
-def trueSol(x):
-    if x <= 1/2:
-        return x
-    else:
-        return 1-x
+#def trueSol(x):
+#    if x <= 1/2:
+#        return x
+#    else:
+#        return 1-x
 
-xss = np.linspace(0,1,1000)
-ys_aprx = np.array([aprxSol(x) for x in xss])
-ys_true = np.array([trueSol(x) for x in xss])
 
-errL2, err = np.sqrt(quad(lambda x: abs(aprxSol(x)-trueSol(x))**2, 0, 1))
-print(errL2,err)
+f = Function(f_cont, f_sing)
 
-plt.plot(xss,ys_aprx)
-plt.plot(xss,ys_true)
+### Solve just a problem ###
+# start = time.perf_counter()
+# solver = PoissonSolver1D(f, N = 1000)
+# solver.assemble()
+# solver.solve()
+# aprxSol = solver.solution
+# end = time.perf_counter()
+# print(f"Solve time:\t{end - start:.6f} seconds")
+# 
+# errs = solver.cal_errs(trueSol)
+# print(f"L2 error:\t{errs[0]}\nL1 error:\t{errs[1]}\nLinf error:\t{errs[2]}")
+# 
+# xss = np.linspace(0,1,1000)
+# ys_aprx = np.array([aprxSol(x) for x in xss])
+# ys_true = np.array([trueSol(x) for x in xss])
+# 
+# plt.plot(xss,ys_aprx)
+# plt.plot(xss,ys_true)
+# plt.show()
+
+### Plot errors ###
+errL2s = np.zeros(100)
+errL1s = np.zeros(100)
+errLinfs = np.zeros(100)
+nss_rand = np.logspace(1,5,50,dtype=int)
+nss_even = 2*nss_rand
+nss_odd = nss_even-1
+nss = np.concatenate((nss_even,nss_odd))
+nss = np.sort(nss)
+
+for i in range(100):
+    solver = PoissonSolver1D(f, N=nss[i])
+    solver.assemble()
+    solver.solve()
+    errs = solver.cal_errs(trueSol)
+    errL2s[i],errL1s[i],errLinfs[i] = errs[0],errs[1],errs[2]
+    print(f"iter {i}")
+    print(f"L2 error:\t{errs[0]}\nL1 error:\t{errs[1]}\nLinf error:\t{errs[2]}")
+    print("\n\n")
+
+plt.loglog(nss,errL2s)
+plt.loglog(nss,errL1s)
+plt.loglog(nss,errLinfs)
+plt.legend(["L2","L1","Linf"])
 plt.show()
