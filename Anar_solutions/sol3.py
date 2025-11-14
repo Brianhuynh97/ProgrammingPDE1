@@ -116,40 +116,41 @@ def isEven(num):
 
 ### FIRST FUNCTION ###
 ## FIRST FUNCTION ##
-f_cont = lambda x: 1
-f_sing = None
+# f_cont = lambda x: 1
+# f_sing = None
 
 ## FIRST TRUE SOLUTION ##
-def trueSol(x):
-    return -(x-1/2)*(x-1/2)/2 + 1/8
+# def trueSol(x):
+#     return -(x-1/2)*(x-1/2)/2 + 1/8
 
 ### SECOND FUNCTION ###
 ## SECOND FUNCTION ##
+f_cont = None
+f_sing = [{"point": 1/2, "weight": 2}]
+
+## SECOND TRUE SOLUTION ##
+def trueSol(x):
+    if x <= 1/2:
+        return x
+    else:
+        return 1-x
+    
+### THIRD FUNCTION ###
+## THIRD FUNCTION ##
 # f_cont = lambda x: np.sin(np.pi*x)
 # f_sing = None
 
-## SECOND TRUE SOLUTION ##
+## THIRD TRUE SOLUTION ##
 # def trueSol(x):
 #     return np.sin(np.pi*x)/(np.pi*np.pi)
 
-### THIRD FUNCTION ###
-## THIRD FUNCTION ##
-# f_cont = None
-# f_sing = [{"point": 1/2, "weight": 2}]
-
-## THIRD TRUE SOLUTION ##
-#def trueSol(x):
-#    if x <= 1/2:
-#        return x
-#    else:
-#        return 1-x
 
 
 f = Function(f_cont, f_sing)
 
 ### Solve just a problem ###
 # start = time.perf_counter()
-# solver = PoissonSolver1D(f, N = 1000)
+# solver = PoissonSolver1D(f, N = 9)
 # solver.assemble()
 # solver.solve()
 # aprxSol = solver.solution
@@ -167,28 +168,50 @@ f = Function(f_cont, f_sing)
 # plt.plot(xss,ys_true)
 # plt.show()
 
-### Plot errors ###
-errL2s = np.zeros(100)
-errL1s = np.zeros(100)
-errLinfs = np.zeros(100)
-nss_rand = np.logspace(1,5,50,dtype=int)
+
+### Plot Errors ###
+errL2s_even = np.zeros(100)
+errL1s_even = np.zeros(100)
+errLinfs_even = np.zeros(100)
+errL2s_odd = np.zeros(100)
+errL1s_odd = np.zeros(100)
+errLinfs_odd = np.zeros(100)
+nss_rand = np.logspace(1,4,100,dtype=int)
 nss_even = 2*nss_rand
-nss_odd = nss_even-1
-nss = np.concatenate((nss_even,nss_odd))
-nss = np.sort(nss)
+nss_odd = nss_even - 1
 
 for i in range(100):
-    solver = PoissonSolver1D(f, N=nss[i])
+    solver = PoissonSolver1D(f, N=nss_even[i])
     solver.assemble()
     solver.solve()
     errs = solver.cal_errs(trueSol)
-    errL2s[i],errL1s[i],errLinfs[i] = errs[0],errs[1],errs[2]
-    print(f"iter {i}")
-    print(f"L2 error:\t{errs[0]}\nL1 error:\t{errs[1]}\nLinf error:\t{errs[2]}")
-    print("\n\n")
+    errL2s_even[i],errL1s_even[i],errLinfs_even[i] = errs[0],errs[1],errs[2]
+#     print(f"iter {i}")
+#     print(f"L2 error:\t{errs[0]}\nL1 error:\t{errs[1]}\nLinf error:\t{errs[2]}")
+#     print("\n\n")
 
-plt.loglog(nss,errL2s)
-plt.loglog(nss,errL1s)
-plt.loglog(nss,errLinfs)
-plt.legend(["L2","L1","Linf"])
+for i in range(100):
+    solver = PoissonSolver1D(f, N=nss_odd[i])
+    solver.assemble()
+    solver.solve()
+    errs = solver.cal_errs(trueSol)
+    errL2s_odd[i],errL1s_odd[i],errLinfs_odd[i] = errs[0],errs[1],errs[2]
+#     print(f"iter {i}")
+#     print(f"L2 error:\t{errs[0]}\nL1 error:\t{errs[1]}\nLinf error:\t{errs[2]}")
+#     print("\n\n")
+
+fig, ax = plt.subplots(figsize = (8,8))
+ax.loglog(nss_even,errL2s_even)
+ax.loglog(nss_even,errL1s_even)
+ax.loglog(nss_even,errLinfs_even)
+
+ax.loglog(nss_odd,errL2s_odd)
+ax.loglog(nss_odd,errL1s_odd)
+ax.loglog(nss_odd,errLinfs_odd)
+
+ax.legend(["L2_even","L1_even","Linf_even","L2_odd","L1_odd","Linf_odd"])
+ax.set_xlabel("N")
+ax.set_ylabel("Error")
+ax.set_title("Error vs N")
+ax.grid(True)
 plt.show()
